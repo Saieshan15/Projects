@@ -1,0 +1,45 @@
+trigger:
+  branches:
+    include:
+      - main
+      
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
+        displayName: 'Build Stage'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              # Commands to compile the source code and generate artifacts
+              # Example: dotnet build -o $(Build.ArtifactStagingDirectory)
+            displayName: 'Build and Generate Artifacts'
+          
+  - stage: Test
+    jobs:
+      - job: Test
+        displayName: 'Test Stage'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              # Commands to run unit tests and code quality checks
+              # Example: dotnet test --collect "Code coverage" --settings $(Agent.TempDirectory)/coverlet.runsettings
+            displayName: 'Run Tests and Code Quality Checks'
+          
+  - stage: Deploy
+    jobs:
+      - deployment: Deploy
+        displayName: 'Deploy Stage'
+        pool:
+          vmImage: 'ubuntu-latest'
+        environment: 'staging'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: |
+                    # Commands to deploy the application to a staging environment
+                    # Example: az webapp deployment source config-zip --resource-group myResourceGroup --name myApp --src $(Build.ArtifactStagingDirectory)/myApp.zip
+                  displayName: 'Deploy to Staging Environment'
